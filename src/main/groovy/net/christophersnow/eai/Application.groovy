@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.stereotype.*
+import org.springframework.beans.factory.annotation.*
 
 
 @Configuration
@@ -17,7 +19,15 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableAutoConfiguration
 @SpringBootApplication
 class Application extends FatJarRouter {
-	
+
+    @Value('${cloudant_username}')
+    private String cl_user
+
+    @Value('${cloudant_password}')
+    private String cl_pass
+
+    @Value('${cloudant_database}')
+    private String cl_db
 	
 	public static void main(String... args) {
 		ApplicationContext applicationContext = new SpringApplication(Application.class).run(args);
@@ -28,13 +38,10 @@ class Application extends FatJarRouter {
  
     @Override
     public void configure() throws Exception {
-        from("netty4-http:http://0.0.0.0:18080").
-            setBody().simple("ref:helloWorld");
-    }
- 
-    @Bean
-    String helloWorld() {
-        return "helloWorld\n";
+    
+        def cloudant_camel_url = "https://${cl_user}.cloudant.com:443/${cl_db}?username=${cl_user}&password=${cl_pass}"
+
+        from("couchdb:${cloudant_camel_url}").to("stream:out");
     }
  
 }

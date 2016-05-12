@@ -4,9 +4,7 @@ buildscript {
     }
     dependencies {
         classpath('org.springframework.boot:spring-boot-gradle-plugin:1.3.5.RELEASE')
-// tag::build[]
         classpath('se.transmode.gradle:gradle-docker:1.2')
-// end::build[]
     }
 }
 
@@ -15,21 +13,18 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
-// tag::plugin[]
 apply plugin: 'docker'
-// end::plugin[]
 
 // This is used as the docker image prefix (org)
 group = 'gregturn'
 
 jar {
-    baseName = 'gs-spring-boot-docker'
+    baseName = 'bluemix-docker-camel'
     version =  '0.1.0'
 }
 
-// tag::task[]
 task buildDocker(type: Docker, dependsOn: build) {
-  push = true
+  push = false
   applicationName = jar.baseName
   dockerfile = file('src/main/docker/Dockerfile')
   doFirst {
@@ -39,7 +34,6 @@ task buildDocker(type: Docker, dependsOn: build) {
     }
   }
 }
-// end::task[]
 
 repositories {
     mavenCentral()
@@ -49,11 +43,12 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web") 
     compile("org.codehaus.groovy:groovy-all:2.2.1")
 	compile("org.apache.camel:camel-core:2.17.0")
 	compile("org.apache.camel:camel-spring-boot-starter:2.17.0")
     compile('org.apache.camel:camel-netty4-http:2.17.0')
+    compile('org.apache.camel:camel-couchdb:2.17.0')
+    compile('org.apache.camel:camel-stream:2.17.0')
 }
 
 task wrapper(type: Wrapper) {
